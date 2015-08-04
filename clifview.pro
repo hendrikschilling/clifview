@@ -11,13 +11,15 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = clifview
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -std=c++11 -Wl,-rpath,/home/hendrik/projects/clif/src/lib
 
 #alternative
 #CONFIG += link_pkgconfig
 #PKGCONFIG += HDF5
 
-LIBS += -L/home/hendrik/projects/clif/src/lib/ libclif.so /usr/lib/libhdf5_cpp.so /usr/lib/libhdf5.so
+QMAKE_LFLAGS += -Wl,-rpath,/home/hendrik/projects/clif/src/lib
+
+LIBS += -L/home/hendrik/projects/clif/src/lib -lclif /usr/lib/libhdf5_cpp.so /usr/lib/libhdf5.so
 INCLUDEPATH += /home/hendrik/projects/clif/src/lib/
 
 

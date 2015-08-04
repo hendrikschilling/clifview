@@ -17,10 +17,10 @@
    <widget class="QGraphicsView" name="mainView">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>50</y>
-      <width>256</width>
-      <height>192</height>
+      <x>130</x>
+      <y>10</y>
+      <width>301</width>
+      <height>191</height>
      </rect>
     </property>
    </widget>
@@ -32,6 +32,19 @@
       <width>101</width>
       <height>251</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QSlider" name="datasetSlider">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>210</y>
+      <width>291</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
     </property>
    </widget>
   </widget>
