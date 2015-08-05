@@ -4,12 +4,64 @@
 #include "clif.hpp"
 
 #include <QFileDialog>
+#include <opencv2/opencv.hpp>
 
-using namespace clif;
+using namespace clif_cv;
 using namespace std;
+using namespace cv;
 
 H5::H5File lffile;
-//clif::Datastore lfdataset;
+CvDatastore lfdataset;
+Mat curview;
+QImage curview_q;
+
+QImage  cvMatToQImage( const cv::Mat &inMat )
+{
+  switch ( inMat.type() )
+  {
+     // 8-bit, 4 channel
+     case CV_8UC4:
+     {
+        QImage image( inMat.data, inMat.cols, inMat.rows, inMat.step, QImage::Format_RGB32 );
+
+        return image;
+     }
+
+     // 8-bit, 3 channel
+     case CV_8UC3:
+     {
+        QImage image( inMat.data, inMat.cols, inMat.rows, inMat.step, QImage::Format_RGB888 );
+
+        return image.rgbSwapped();
+     }
+
+     // 8-bit, 1 channel
+     case CV_8UC1:
+     {
+        static QVector<QRgb>  sColorTable;
+
+        // only create our color table once
+        if ( sColorTable.isEmpty() )
+        {
+           for ( int i = 0; i < 256; ++i )
+              sColorTable.push_back( qRgb( i, i, i ) );
+        }
+
+        QImage image( inMat.data, inMat.cols, inMat.rows, inMat.step, QImage::Format_Indexed8 );
+
+        image.setColorTable( sColorTable );
+
+        return image;
+     }
+
+     default:
+        printf("conversion error!\n");
+        //std::cout << "::cvMatToQImage() - cv::Mat image type not handled in switch:" << inMat.type();
+        break;
+  }
+
+  return QImage();
+}
 
 ClifView::ClifView(QWidget *parent) :
     QMainWindow(parent),
@@ -36,12 +88,21 @@ void ClifView::on_actionOpen_triggered()
     ui->datasetList->addItem(QString(datasets[i].c_str()));
 }
 
-/*void ClifView::on_datasetList_clicked(const QModelIndex &index)
-{
-
-}
-
 void ClifView::on_datasetList_itemActivated(QListWidgetItem *item)
 {
-  lfdataset =
-}*/
+    string group_str("/clif/");
+    group_str.append(item->text().toUtf8().constData());
+
+    //printf("selected %s\n", group_str.c_str());
+
+    lfdataset = CvDatastore(lffile, group_str);
+
+    lfdataset.readCvMat(0, curview);
+
+    curview *= 1.0/256.0;
+    curview.convertTo(curview, CV_8U);
+
+    curview_q = cvMatToQImage(curview);
+
+    ui->viewer->setPixmap(QPixmap::fromImage(curview_q));
+}

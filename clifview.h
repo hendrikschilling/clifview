@@ -2,6 +2,7 @@
 #define CLIFVIEW_H
 
 #include <QMainWindow>
+#include <QListWidgetItem>
 
 namespace Ui {
 class ClifView;
@@ -18,9 +19,7 @@ public:
 private slots:
     void on_actionOpen_triggered();
 
-    //void on_datasetList_clicked(const QModelIndex &index);
-
-    //void on_datasetList_itemActivated(QListWidgetItem *item);
+    void on_datasetList_itemActivated(QListWidgetItem *item);
 
 private:
     Ui::ClifView *ui;
