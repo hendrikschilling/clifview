@@ -21,6 +21,8 @@ private slots:
 
     void on_datasetList_itemActivated(QListWidgetItem *item);
 
+    void on_pushFit_clicked();
+
 private:
     Ui::ClifView *ui;
 };

@@ -24,8 +24,10 @@ INCLUDEPATH += /home/hendrik/projects/clif/src/lib/
 
 
 SOURCES += main.cpp\
-        clifview.cpp
+        clifview.cpp\
+        scaledqgraphicsview.cpp
 
-HEADERS  += clifview.h
+HEADERS  += clifview.h \
+    scaledqgraphicsview.h
 
 FORMS    += clifview.ui

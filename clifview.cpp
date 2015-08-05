@@ -104,5 +104,18 @@ void ClifView::on_datasetList_itemActivated(QListWidgetItem *item)
 
     curview_q = cvMatToQImage(curview);
 
-    ui->viewer->setPixmap(QPixmap::fromImage(curview_q));
+    QGraphicsScene* scene = new QGraphicsScene();
+    ui->viewer->setScene(scene);
+
+    ui->viewer->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+
+    scene->addPixmap(QPixmap::fromImage(curview_q));
+    ui->viewer->show();
+
+    //ui->viewer->setBackgroundBrush(curview_q);
+}
+
+void ClifView::on_pushFit_clicked()
+{
+    ui->viewer->fitInView(ui->viewer->sceneRect(), Qt::KeepAspectRatio);
 }
