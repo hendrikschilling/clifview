@@ -12,7 +12,10 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent * event);
-
+    void mousePressEvent(QMouseEvent *me);
+    void wheelEvent(QWheelEvent * event);
+private:
+    bool fit = true;
 };
 
 

@@ -109,7 +109,6 @@ void ClifView::setView(int idx)
         curview_scene = new QGraphicsScene();
 
     ui->viewer->setScene(curview_scene);
-    ui->viewer->fitInView(curview_scene->sceneRect(), Qt::KeepAspectRatio);
 
     if (curview_pmi)
         delete curview_pmi;
