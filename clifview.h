@@ -16,12 +16,14 @@ public:
     explicit ClifView(QWidget *parent = 0);
     ~ClifView();
 
+    void setView(int idx);
+
 private slots:
     void on_actionOpen_triggered();
 
     void on_datasetList_itemActivated(QListWidgetItem *item);
 
-    void on_pushFit_clicked();
+    void on_datasetSlider_valueChanged(int value);
 
 private:
     Ui::ClifView *ui;

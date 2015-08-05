@@ -4,6 +4,7 @@
 #include "clif.hpp"
 
 #include <QFileDialog>
+#include <QGraphicsPixmapItem>
 #include <opencv2/opencv.hpp>
 
 using namespace clif_cv;
@@ -14,6 +15,8 @@ H5::H5File lffile;
 CvDatastore lfdataset;
 Mat curview;
 QImage curview_q;
+QGraphicsScene *curview_scene = NULL;
+QGraphicsPixmapItem *curview_pmi = NULL;
 
 QImage  cvMatToQImage( const cv::Mat &inMat )
 {
@@ -88,6 +91,28 @@ void ClifView::on_actionOpen_triggered()
     ui->datasetList->addItem(QString(datasets[i].c_str()));
 }
 
+void ClifView::setView(int idx)
+{
+    lfdataset.readCvMat(idx, curview);
+
+    curview *= 1.0/256.0;
+    curview.convertTo(curview, CV_8U);
+
+    curview_q = cvMatToQImage(curview);
+
+    if (!curview_scene)
+        curview_scene = new QGraphicsScene();
+
+    ui->viewer->setScene(curview_scene);
+    ui->viewer->fitInView(curview_scene->sceneRect(), Qt::KeepAspectRatio);
+
+    if (curview_pmi)
+        delete curview_pmi;
+    curview_pmi = curview_scene->addPixmap(QPixmap::fromImage(curview_q));
+    ui->viewer->show();
+
+}
+
 void ClifView::on_datasetList_itemActivated(QListWidgetItem *item)
 {
     string group_str("/clif/");
@@ -97,25 +122,13 @@ void ClifView::on_datasetList_itemActivated(QListWidgetItem *item)
 
     lfdataset = CvDatastore(lffile, group_str);
 
-    lfdataset.readCvMat(0, curview);
+    ui->datasetSlider->setMaximum(lfdataset.count()-1);
+    ui->datasetSlider->setValue(0);
 
-    curview *= 1.0/256.0;
-    curview.convertTo(curview, CV_8U);
-
-    curview_q = cvMatToQImage(curview);
-
-    QGraphicsScene* scene = new QGraphicsScene();
-    ui->viewer->setScene(scene);
-
-    ui->viewer->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
-
-    scene->addPixmap(QPixmap::fromImage(curview_q));
-    ui->viewer->show();
-
-    //ui->viewer->setBackgroundBrush(curview_q);
+    setView(0);
 }
 
-void ClifView::on_pushFit_clicked()
+void ClifView::on_datasetSlider_valueChanged(int value)
 {
-    ui->viewer->fitInView(ui->viewer->sceneRect(), Qt::KeepAspectRatio);
+    setView(value);
 }

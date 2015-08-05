@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>562</width>
-    <height>491</height>
+    <width>599</width>
+    <height>508</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>562</width>
+     <width>599</width>
      <height>19</height>
     </rect>
    </property>
@@ -61,6 +61,12 @@
       <verstretch>0</verstretch>
      </sizepolicy>
     </property>
+    <property name="sizeIncrement">
+     <size>
+      <width>1</width>
+      <height>1</height>
+     </size>
+    </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="ScaledQGraphicsView" name="viewer">
@@ -80,21 +86,22 @@
      </item>
      <item>
       <widget class="QSlider" name="datasetSlider">
+       <property name="maximum">
+        <number>99</number>
+       </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="tickPosition">
+        <enum>QSlider::NoTicks</enum>
+       </property>
+       <property name="tickInterval">
+        <number>0</number>
        </property>
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QPushButton" name="pushFit">
-         <property name="text">
-          <string>PushButton</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <layout class="QHBoxLayout" name="horizontalLayout"/>
      </item>
     </layout>
    </widget>
