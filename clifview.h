@@ -25,6 +25,8 @@ private slots:
 
     void on_datasetSlider_valueChanged(int value);
 
+    void on_selViewProc_currentIndexChanged(int index);
+
 private:
     Ui::ClifView *ui;
 };

@@ -93,7 +93,12 @@ void ClifView::on_actionOpen_triggered()
 
 void ClifView::setView(int idx)
 {
-    lfdataset.readCvMat(idx, curview);
+    int flags = 0;
+    switch (ui->selViewProc->currentIndex()) {
+        case 1 : flags = CLIF_DEMOSAIC; break;
+    }
+
+    lfdataset.readCvMat(idx, curview, flags);
 
     curview *= 1.0/256.0;
     curview.convertTo(curview, CV_8U);
@@ -131,4 +136,9 @@ void ClifView::on_datasetList_itemActivated(QListWidgetItem *item)
 void ClifView::on_datasetSlider_valueChanged(int value)
 {
     setView(value);
+}
+
+void ClifView::on_selViewProc_currentIndexChanged(int index)
+{
+    setView(ui->datasetSlider->value());
 }
