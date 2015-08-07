@@ -88,8 +88,13 @@ void ClifView::on_actionOpen_triggered()
 
   vector<string> datasets = Datasets(lffile);
 
-  for(uint i=0;i<datasets.size();i++)
-    ui->datasetList->addItem(QString(datasets[i].c_str()));
+  for(uint i=0;i<datasets.size();i++) {
+     QString path(datasets[i].c_str());
+     ui->datasetList->addItem(path);
+     QTreeWidgetItem *item = new QTreeWidgetItem(ui->tree, QStringList(path));
+     item->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
+     item->setData(0, Qt::UserRole, QVariant(path));
+  }
 }
 
 void ClifView::setView(int idx)
@@ -130,6 +135,8 @@ void ClifView::on_datasetList_itemActivated(QListWidgetItem *item)
     lfdataset = Dataset(lffile, group_str);
     lfdatastore = CvDatastore(&lfdataset, "data");
 
+    lfdataset.attrs.getTree().print();
+
     ui->datasetSlider->setMaximum(lfdatastore.count()-1);
     ui->datasetSlider->setValue(0);
 
@@ -144,4 +151,34 @@ void ClifView::on_datasetSlider_valueChanged(int value)
 void ClifView::on_selViewProc_currentIndexChanged(int index)
 {
     setView(ui->datasetSlider->value());
+}
+
+void attachTreeItem(QTreeWidgetItem *w, StringTree *t)
+{
+    if (t->val.second)
+        w->setData(1, Qt::DisplayRole, QString(((Attribute*)t->val.second)->toString().c_str()));
+
+    for(int i=0;i<t->childCount();i++) {
+        QTreeWidgetItem *item = new QTreeWidgetItem(w, QStringList(QString(t->childs[i].val.first.c_str())));
+        attachTreeItem(item, &t->childs[i]);
+    }
+}
+
+void ClifView::on_tree_itemExpanded(QTreeWidgetItem *item)
+{
+  if (!item->data(0, Qt::UserRole).isValid())
+      return;
+
+  std::string root = item->data(0, Qt::UserRole).toString().toUtf8().constData();;
+
+  string group_str("/clif/");
+  group_str.append(root);
+
+  //printf("selected %s\n", group_str.c_str());
+
+  lfdataset = Dataset(lffile, group_str);
+
+  StringTree tree = lfdataset.attrs.getTree();
+
+  attachTreeItem(item, &tree);
 }

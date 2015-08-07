@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QListWidgetItem>
+#include <QTreeWidgetItem>
 
 namespace Ui {
 class ClifView;
@@ -26,6 +27,8 @@ private slots:
     void on_datasetSlider_valueChanged(int value);
 
     void on_selViewProc_currentIndexChanged(int index);
+
+    void on_tree_itemExpanded(QTreeWidgetItem *item);
 
 private:
     Ui::ClifView *ui;
