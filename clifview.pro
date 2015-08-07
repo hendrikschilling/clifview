@@ -17,9 +17,10 @@ QMAKE_CXXFLAGS += -std=c++11 -Wl,-rpath,/home/hendrik/projects/clif/src/lib
 CONFIG += link_pkgconfig
 PKGCONFIG += opencv
 
-QMAKE_LFLAGS += -Wl,-rpath,/home/hendrik/projects/clif/src/lib
+QMAKE_LFLAGS += -Wl,-rpath,/home/hendrik/projects/clif/src/lib -Wl,-rpath,/home/hendrik/projects/clif/external/cliini
+#QMAKE_LFLAGS += -Wl,-rpath,/home/hendrik/projects/clif/external/cliini
 
-LIBS += -L/home/hendrik/projects/clif/src/lib -lclif /usr/lib/libhdf5_cpp.so /usr/lib/libhdf5.so
+LIBS += -L/home/hendrik/projects/clif/src/lib -L/home/hendrik/projects/clif/external/cliini -lclif -lcliini /usr/lib/libhdf5_cpp.so /usr/lib/libhdf5.so
 INCLUDEPATH += /home/hendrik/projects/clif/src/lib/
 
 

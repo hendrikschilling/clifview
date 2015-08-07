@@ -12,7 +12,8 @@ using namespace std;
 using namespace cv;
 
 H5::H5File lffile;
-CvDatastore lfdataset;
+CvDatastore lfdatastore;
+Dataset lfdataset;
 Mat curview;
 QImage curview_q;
 QGraphicsScene *curview_scene = NULL;
@@ -98,10 +99,12 @@ void ClifView::setView(int idx)
         case 1 : flags = CLIF_DEMOSAIC; break;
     }
 
-    lfdataset.readCvMat(idx, curview, flags);
+    lfdatastore.readCvMat(idx, curview, flags);
 
     curview *= 1.0/256.0;
     curview.convertTo(curview, CV_8U);
+
+    imwrite("debug.tif", curview);
 
     curview_q = cvMatToQImage(curview);
 
@@ -124,9 +127,10 @@ void ClifView::on_datasetList_itemActivated(QListWidgetItem *item)
 
     //printf("selected %s\n", group_str.c_str());
 
-    lfdataset = CvDatastore(lffile, group_str);
+    lfdataset = Dataset(lffile, group_str);
+    lfdatastore = CvDatastore(&lfdataset, "data");
 
-    ui->datasetSlider->setMaximum(lfdataset.count()-1);
+    ui->datasetSlider->setMaximum(lfdatastore.count()-1);
     ui->datasetSlider->setValue(0);
 
     setView(0);
