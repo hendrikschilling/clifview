@@ -5,6 +5,8 @@
 #include <QListWidgetItem>
 #include <QTreeWidgetItem>
 
+class DatasetRoot;
+
 namespace Ui {
 class ClifView;
 }
@@ -17,18 +19,18 @@ public:
     explicit ClifView(QWidget *parent = 0);
     ~ClifView();
 
-    void setView(int idx);
+    void setView(DatasetRoot *root, int idx);
 
 private slots:
     void on_actionOpen_triggered();
-
-    void on_datasetList_itemActivated(QListWidgetItem *item);
 
     void on_datasetSlider_valueChanged(int value);
 
     void on_selViewProc_currentIndexChanged(int index);
 
     void on_tree_itemExpanded(QTreeWidgetItem *item);
+
+    void on_tree_itemActivated(QTreeWidgetItem *item, int column);
 
 private:
     Ui::ClifView *ui;
