@@ -58,7 +58,7 @@ public:
         openDataset();
 
         if (!expanded) {
-            StringTree tree = dataset.attrs.getTree();
+            StringTree tree = dataset.getTree();
 
             attachTreeItem(item, &tree);
         }
