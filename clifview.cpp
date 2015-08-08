@@ -36,7 +36,6 @@ void attachTreeItem(QTreeWidgetItem *w, StringTree *t)
 class DatasetRoot {
 public:
     bool expanded = false;
-    bool active = false; //current data is this root
     CvDatastore datastore;
     Dataset dataset;
     std::string name;
@@ -212,23 +211,6 @@ void ClifView::on_tree_itemExpanded(QTreeWidgetItem *item)
     DatasetRoot *root = QVP<DatasetRoot>::asPtr(item->data(0, Qt::UserRole));
     
     root->expand(item);
-
-    //std::string root = item->data(0, Qt::UserRole).toString().toUtf8().constData();;
-
-    /*string group_str("/clif/");
-    group_str.append(root);
-
-    lfdataset = Dataset(lffile, group_str);
-    lfdatastore = CvDatastore(&lfdataset, "data");*/
-
-    /*ui->datasetSlider->setMaximum(lfdatastore.count()-1);
-    ui->datasetSlider->setValue(0);
-
-    setView(0);
-
-    StringTree tree = lfdataset.attrs.getTree();
-
-    attachTreeItem(item, &tree);*/
 }
 
 void ClifView::on_tree_itemActivated(QTreeWidgetItem *item, int column)
@@ -239,6 +221,11 @@ void ClifView::on_tree_itemActivated(QTreeWidgetItem *item, int column)
     DatasetRoot *root = QVP<DatasetRoot>::asPtr(item->data(0, Qt::UserRole));
     root_curr = root;
     
+    
     root->openDatastore();
-    setView(root, 0);
+    
+    ui->datasetSlider->setMaximum(root->datastore.count()-1);
+    ui->datasetSlider->setValue(0);
+    
+    on_datasetSlider_valueChanged(0);
 }
