@@ -134,6 +134,9 @@ ClifView::ClifView(QWidget *parent) :
     ui(new Ui::ClifView)
 {
     ui->setupUi(this);
+
+    QStringList headerLabels = {QString("path"), QString("value")};
+    ui->tree->setHeaderLabels(headerLabels);
 }
 
 ClifView::~ClifView()
