@@ -12,12 +12,13 @@ using namespace clif_cv;
 using namespace std;
 using namespace cv;
 
-
-H5::H5File lffile;
+//H5::H5File lffile;
 Mat curview;
 QImage curview_q;
 QGraphicsScene *curview_scene = NULL;
 QGraphicsPixmapItem *curview_pmi = NULL;
+
+CvClifFile lf_file;
 
 vector<DatasetRoot*> root_list;
 DatasetRoot *root_curr = NULL;
@@ -36,21 +37,23 @@ void attachTreeItem(QTreeWidgetItem *w, StringTree *t)
 class DatasetRoot {
 public:
     bool expanded = false;
-    CvDatastore datastore;
-    Dataset dataset;
+    CvClifDataset dataset;
     std::string name;
-    H5::H5File *f;
+    CvClifFile *f = NULL;
 
-    DatasetRoot(std::string name_) : name(name_) {};
+    DatasetRoot(CvClifFile *f_, std::string name_) : f(f_), name(name_) {};
 
     void openDataset()
     {
         if (!dataset.valid()) {
-            string group_str("/clif/");
-            group_str.append(name);
-
-            dataset = Dataset(lffile, group_str);
+          //ClifDataset tmp_set = f->openDataset(name);
+          //(clif::Dataset)dataset = tmp_set;
+          //dataset = static_cast<CvClifDataset&>(tmp_set);
+          //abort();
+          dataset = f->openDataset(name);
         }
+          //(clif::Dataset)dataset = f->openDataset(name);
+          //static_cast<clif::Dataset&>(dataset) = f->openDataset(name);
     }
 
     void expand(QTreeWidgetItem *item)
@@ -61,15 +64,6 @@ public:
             StringTree tree = dataset.getTree();
 
             attachTreeItem(item, &tree);
-        }
-    }
-
-    void openDatastore()
-    {
-        openDataset();
-
-        if (!datastore.valid()) {
-            datastore = CvDatastore(&dataset, "data");
         }
     }
 };
@@ -148,16 +142,19 @@ void ClifView::on_actionOpen_triggered()
 {
   QString filename = QFileDialog::getOpenFileName(this,
         tr("Open clif File"));
+  
+  std::string path(filename.toLocal8Bit().constData());
+  lf_file.open(path, H5F_ACC_RDONLY);
+  
+  //lffile = H5::H5File(filename.toLocal8Bit().constData(), H5F_ACC_RDONLY);
 
-  lffile = H5::H5File(filename.toLocal8Bit().constData(), H5F_ACC_RDONLY);
-
-  vector<string> datasets = Datasets(lffile);
+  vector<string> datasets = lf_file.datasetList();
   
   //FIXME clean root list!
 
   for(uint i=0;i<datasets.size();i++) {
      QString path(datasets[i].c_str());
-     DatasetRoot *root = new DatasetRoot(datasets[i]);
+     DatasetRoot *root = new DatasetRoot(&lf_file, datasets[i]);
      
      QTreeWidgetItem *item = new QTreeWidgetItem(ui->tree, QStringList(path));
      item->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
@@ -176,7 +173,7 @@ void ClifView::setView(DatasetRoot *root, int idx)
         case 1 : flags = CLIF_DEMOSAIC; break;
     }
 
-    root->datastore.readCvMat(idx, curview, flags);
+    root->dataset.readCvMat(idx, curview, flags);    
 
     curview *= 1.0/256.0;
     curview.convertTo(curview, CV_8U);
@@ -225,9 +222,9 @@ void ClifView::on_tree_itemActivated(QTreeWidgetItem *item, int column)
     root_curr = root;
     
     
-    root->openDatastore();
+    root->openDataset();
     
-    ui->datasetSlider->setMaximum(root->datastore.count()-1);
+    ui->datasetSlider->setMaximum(root->dataset.imgCount()-1);
     ui->datasetSlider->setValue(0);
     
     on_datasetSlider_valueChanged(0);

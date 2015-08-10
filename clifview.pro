@@ -14,6 +14,8 @@ TEMPLATE = app
 QMAKE_CXXFLAGS += -std=c++11 -Wl,-rpath,/home/hendrik/projects/clif/src/lib
 
 #alternative
+CONFIG += debug
+
 CONFIG += link_pkgconfig
 PKGCONFIG += opencv
 
