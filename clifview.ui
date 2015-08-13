@@ -26,7 +26,7 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QGridLayout" name="gridLayout_2">
+   <layout class="QGridLayout" name="gridLayout_3">
     <item row="0" column="0">
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
@@ -58,7 +58,7 @@
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="clifScaledGraphicsView" name="viewer">
+           <widget class="clifScaledImageView" name="viewer">
             <property name="sizeAdjustPolicy">
              <enum>QAbstractScrollArea::AdjustToContents</enum>
             </property>
@@ -152,16 +152,16 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>set horopter</string>
+    <string>&amp;set horopter</string>
    </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>clifScaledGraphicsView</class>
+   <class>clifScaledImageView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">clifscaledgraphicsview.hpp</header>
+   <header>clifscaledimageview.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

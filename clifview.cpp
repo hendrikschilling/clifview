@@ -8,13 +8,15 @@
 #include <opencv2/opencv.hpp>
 
 #include "clifepiview.hpp"
+#include "clifqt.hpp"
 
 using namespace clif_cv;
+using namespace clif_qt;
 using namespace std;
 using namespace cv;
 
 //H5::H5File lffile;
-Mat curview;
+//Mat curview;
 QImage curview_q;
 
 ClifFile lf_file;
@@ -73,7 +75,7 @@ public:
     static T* asPtr(QVariant v) { return  (T *) v.value<void *>(); }
     static QVariant asQVariant(T* ptr) { return qVariantFromValue((void *) ptr); }
 };
-
+/*
 QImage  cvMatToQImage( const cv::Mat &inMat )
 {
   switch ( inMat.type() )
@@ -120,7 +122,7 @@ QImage  cvMatToQImage( const cv::Mat &inMat )
   }
 
   return QImage();
-}
+}*/
 
 ClifView::ClifView(QWidget *parent) :
     QMainWindow(parent),
@@ -136,9 +138,6 @@ ClifView::~ClifView()
 {
     delete ui;
 }
-
-DlgFind *finder;
-
 
 void ClifView::on_actionOpen_triggered()
 {
@@ -164,8 +163,6 @@ void ClifView::on_actionOpen_triggered()
      item->setData(0, Qt::UserRole, QVP<DatasetRoot>::asQVariant(root));
      root_list.push_back(root);
   }
-
-  ui->menuTools->actions().at(0)->setEnabled(true);
 }
 
 void ClifView::setView(DatasetRoot *root, int idx)
@@ -177,13 +174,7 @@ void ClifView::setView(DatasetRoot *root, int idx)
         case 1 : flags = CLIF_DEMOSAIC; break;
     }
 
-    readCvMat(root->dataset, idx, curview, flags);    
-
-    curview *= 1.0/256.0;
-    curview.convertTo(curview, CV_8U);
-
-    curview_q = cvMatToQImage(curview);
-    curview_q = curview_q.copy();
+    readQImage(root->dataset, idx, curview_q, flags);
 
     ui->viewer->setImage(curview_q);
 }
@@ -216,8 +207,8 @@ void ClifView::on_tree_itemActivated(QTreeWidgetItem *item, int column)
     DatasetRoot *root = QVP<DatasetRoot>::asPtr(item->data(0, Qt::UserRole));
     root_curr = root;
     
-    
     root->openDataset();
+    ui->menuTools->actions().at(0)->setEnabled(true);
     
     ui->datasetSlider->setMaximum(root->dataset.imgCount()-1);
     ui->datasetSlider->setValue(0);
@@ -227,5 +218,5 @@ void ClifView::on_tree_itemActivated(QTreeWidgetItem *item, int column)
 
 void ClifView::on_actionSet_horopter_triggered()
 {
-    QString tmp = DlgFind::getString(this);
+    double h = DlgFind::getHoropter(&root_curr->dataset, this);
 }

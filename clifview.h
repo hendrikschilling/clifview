@@ -5,11 +5,15 @@
 #include <QListWidgetItem>
 #include <QTreeWidgetItem>
 
+#include "clifqt.hpp"
+
 class DatasetRoot;
 
 namespace Ui {
 class ClifView;
 }
+
+using namespace clif_qt;
 
 class ClifView : public QMainWindow
 {
