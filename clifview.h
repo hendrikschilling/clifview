@@ -32,6 +32,8 @@ private slots:
 
     void on_tree_itemActivated(QTreeWidgetItem *item, int column);
 
+    void on_actionSet_horopter_triggered();
+
 private:
     Ui::ClifView *ui;
 };

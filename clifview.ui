@@ -58,7 +58,7 @@
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="ScaledQGraphicsView" name="viewer">
+           <widget class="clifScaledGraphicsView" name="viewer">
             <property name="sizeAdjustPolicy">
              <enum>QAbstractScrollArea::AdjustToContents</enum>
             </property>
@@ -121,7 +121,14 @@
     <addaction name="separator"/>
     <addaction name="actionOpen"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionSet_horopter"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -140,13 +147,21 @@
     <string>open clif file</string>
    </property>
   </action>
+  <action name="actionSet_horopter">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>set horopter</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>ScaledQGraphicsView</class>
+   <class>clifScaledGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header>scaledqgraphicsview.h</header>
+   <header location="global">clifscaledgraphicsview.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

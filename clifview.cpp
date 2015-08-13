@@ -3,10 +3,11 @@
 
 #include "clif.hpp"
 
-
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
 #include <opencv2/opencv.hpp>
+
+#include "clifepiview.hpp"
 
 using namespace clif_cv;
 using namespace std;
@@ -15,18 +16,16 @@ using namespace cv;
 //H5::H5File lffile;
 Mat curview;
 QImage curview_q;
-QGraphicsScene *curview_scene = NULL;
-QGraphicsPixmapItem *curview_pmi = NULL;
 
-CvClifFile lf_file;
+ClifFile lf_file;
 
 vector<DatasetRoot*> root_list;
 DatasetRoot *root_curr = NULL;
 
-void attachTreeItem(QTreeWidgetItem *w, StringTree *t)
+void attachTreeItem(QTreeWidgetItem *w, StringTree<Attribute*> *t)
 {
-    if (t->val.second)
-        w->setData(1, Qt::DisplayRole, QString(((Attribute*)t->val.second)->toString().c_str()));
+    if (std::get<0>(t->val.second))
+        w->setData(1, Qt::DisplayRole, QString(std::get<0>(t->val.second)->toString().c_str()));
 
     for(int i=0;i<t->childCount();i++) {
         QTreeWidgetItem *item = new QTreeWidgetItem(w, QStringList(QString(t->childs[i].val.first.c_str())));
@@ -37,18 +36,18 @@ void attachTreeItem(QTreeWidgetItem *w, StringTree *t)
 class DatasetRoot {
 public:
     bool expanded = false;
-    CvClifDataset dataset;
+    ClifDataset dataset;
     std::string name;
-    CvClifFile *f = NULL;
+    ClifFile *f = NULL;
 
-    DatasetRoot(CvClifFile *f_, std::string name_) : f(f_), name(name_) {};
+    DatasetRoot(ClifFile *f_, std::string name_) : f(f_), name(name_) {};
 
     void openDataset()
     {
         if (!dataset.valid()) {
           //ClifDataset tmp_set = f->openDataset(name);
           //(clif::Dataset)dataset = tmp_set;
-          //dataset = static_cast<CvClifDataset&>(tmp_set);
+          //dataset = static_cast<ClifDataset&>(tmp_set);
           //abort();
           dataset = f->openDataset(name);
         }
@@ -61,7 +60,7 @@ public:
         openDataset();
 
         if (!expanded) {
-            StringTree tree = dataset.getTree();
+            StringTree<Attribute*> tree = dataset.getTree();
 
             attachTreeItem(item, &tree);
         }
@@ -138,6 +137,9 @@ ClifView::~ClifView()
     delete ui;
 }
 
+DlgFind *finder;
+
+
 void ClifView::on_actionOpen_triggered()
 {
   QString filename = QFileDialog::getOpenFileName(this,
@@ -162,6 +164,8 @@ void ClifView::on_actionOpen_triggered()
      item->setData(0, Qt::UserRole, QVP<DatasetRoot>::asQVariant(root));
      root_list.push_back(root);
   }
+
+  ui->menuTools->actions().at(0)->setEnabled(true);
 }
 
 void ClifView::setView(DatasetRoot *root, int idx)
@@ -173,24 +177,15 @@ void ClifView::setView(DatasetRoot *root, int idx)
         case 1 : flags = CLIF_DEMOSAIC; break;
     }
 
-    root->dataset.readCvMat(idx, curview, flags);    
+    readCvMat(root->dataset, idx, curview, flags);    
 
     curview *= 1.0/256.0;
     curview.convertTo(curview, CV_8U);
 
-    imwrite("debug.tif", curview);
-
     curview_q = cvMatToQImage(curview);
+    curview_q = curview_q.copy();
 
-    if (!curview_scene)
-        curview_scene = new QGraphicsScene();
-
-    ui->viewer->setScene(curview_scene);
-
-    if (curview_pmi)
-        delete curview_pmi;
-    curview_pmi = curview_scene->addPixmap(QPixmap::fromImage(curview_q));
-    ui->viewer->show();
+    ui->viewer->setImage(curview_q);
 }
 
 void ClifView::on_datasetSlider_valueChanged(int value)
@@ -228,4 +223,9 @@ void ClifView::on_tree_itemActivated(QTreeWidgetItem *item, int column)
     ui->datasetSlider->setValue(0);
     
     on_datasetSlider_valueChanged(0);
+}
+
+void ClifView::on_actionSet_horopter_triggered()
+{
+    QString tmp = DlgFind::getString(this);
 }
