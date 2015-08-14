@@ -38,7 +38,7 @@ void attachTreeItem(QTreeWidgetItem *w, StringTree<Attribute*> *t)
 class DatasetRoot {
 public:
     bool expanded = false;
-    ClifDataset dataset;
+    ClifDataset *dataset = NULL;
     std::string name;
     ClifFile *f = NULL;
 
@@ -46,15 +46,8 @@ public:
 
     void openDataset()
     {
-        if (!dataset.valid()) {
-          //ClifDataset tmp_set = f->openDataset(name);
-          //(clif::Dataset)dataset = tmp_set;
-          //dataset = static_cast<ClifDataset&>(tmp_set);
-          //abort();
+        if (!dataset)
           dataset = f->openDataset(name);
-        }
-          //(clif::Dataset)dataset = f->openDataset(name);
-          //static_cast<clif::Dataset&>(dataset) = f->openDataset(name);
     }
 
     void expand(QTreeWidgetItem *item)
@@ -62,10 +55,16 @@ public:
         openDataset();
 
         if (!expanded) {
-            StringTree<Attribute*> tree = dataset.getTree();
+            StringTree<Attribute*> tree = dataset->getTree();
 
             attachTreeItem(item, &tree);
         }
+    }
+    
+    ~DatasetRoot()
+    {
+      if (dataset)
+        delete dataset;
     }
 };
 
@@ -174,7 +173,7 @@ void ClifView::setView(DatasetRoot *root, int idx)
         case 1 : flags = CLIF_DEMOSAIC; break;
     }
 
-    readQImage(root->dataset, idx, curview_q, flags);
+    readQImage(*root->dataset, idx, curview_q, flags);
 
     ui->viewer->setImage(curview_q);
 }
@@ -210,7 +209,7 @@ void ClifView::on_tree_itemActivated(QTreeWidgetItem *item, int column)
     root->openDataset();
     ui->menuTools->actions().at(0)->setEnabled(true);
     
-    ui->datasetSlider->setMaximum(root->dataset.imgCount()-1);
+    ui->datasetSlider->setMaximum(root->dataset->imgCount()-1);
     ui->datasetSlider->setValue(0);
     
     on_datasetSlider_valueChanged(0);
@@ -218,5 +217,5 @@ void ClifView::on_tree_itemActivated(QTreeWidgetItem *item, int column)
 
 void ClifView::on_actionSet_horopter_triggered()
 {
-    double h = DlgFind::getHoropterDepth(&root_curr->dataset, this);
+    double h = DlgFind::getHoropterDepth(root_curr->dataset, this);
 }
