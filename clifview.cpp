@@ -218,5 +218,5 @@ void ClifView::on_tree_itemActivated(QTreeWidgetItem *item, int column)
 
 void ClifView::on_actionSet_horopter_triggered()
 {
-    double h = DlgFind::getHoropter(&root_curr->dataset, this);
+    double h = DlgFind::getHoropterDepth(&root_curr->dataset, this);
 }
