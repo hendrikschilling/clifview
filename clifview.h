@@ -5,7 +5,7 @@
 #include <QListWidgetItem>
 #include <QTreeWidgetItem>
 
-#include "clifqt.hpp"
+#include "clif_qt.hpp"
 
 class DatasetRoot;
 
@@ -13,7 +13,7 @@ namespace Ui {
 class ClifView;
 }
 
-using namespace clif_qt;
+using namespace clif;
 
 class ClifView : public QMainWindow
 {
@@ -37,6 +37,8 @@ private slots:
     void on_tree_itemActivated(QTreeWidgetItem *item, int column);
 
     void on_actionSet_horopter_triggered();
+    
+    void slider_changed_delayed();
 
 private:
     Ui::ClifView *ui;

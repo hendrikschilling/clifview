@@ -3,21 +3,22 @@
 
 #include "clif.hpp"
 
+#include <QTimer>
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
 #include <opencv2/opencv.hpp>
 
 #include "clifepiview.hpp"
-#include "clifqt.hpp"
+#include "clif_qt.hpp"
 
-using namespace clif_cv;
-using namespace clif_qt;
+using namespace clif;
 using namespace std;
 using namespace cv;
 
 //H5::H5File lffile;
 //Mat curview;
 QImage curview_q;
+QTimer *_timer = NULL;
 
 ClifFile lf_file;
 
@@ -38,9 +39,10 @@ void attachTreeItem(QTreeWidgetItem *w, StringTree<Attribute*> *t)
 class DatasetRoot {
 public:
     bool expanded = false;
-    ClifDataset *dataset = NULL;
+    Dataset *dataset = NULL;
     std::string name;
     ClifFile *f = NULL;
+    int cur_view = 0;
 
     DatasetRoot(ClifFile *f_, std::string name_) : f(f_), name(name_) {};
 
@@ -170,17 +172,35 @@ void ClifView::setView(DatasetRoot *root, int idx)
       return;
     int flags = 0;
     switch (ui->selViewProc->currentIndex()) {
-        case 1 : flags = CLIF_DEMOSAIC; break;
+        case 1 : flags = DEMOSAIC; break;
+        case 2 : flags = UNDISTORT; break;
     }
 
-    readQImage(*root->dataset, idx, curview_q, flags);
+    readQImage(root->dataset, idx, curview_q, flags);
 
     ui->viewer->setImage(curview_q);
 }
 
+void ClifView::slider_changed_delayed()
+{
+  if (_timer) {
+    delete _timer;
+    _timer = NULL;
+  }
+  
+  setView(root_curr, root_curr->cur_view);
+  qApp->processEvents();
+}
+
 void ClifView::on_datasetSlider_valueChanged(int value)
 {
-    setView(root_curr, value);
+  if (!_timer) {
+    root_curr->cur_view = value;
+    _timer = new QTimer(this);
+    connect(_timer, SIGNAL(timeout()), SLOT(slider_changed_delayed()));
+    _timer->setSingleShot(true);
+    _timer->start(0);
+  }
 }
 
 void ClifView::on_selViewProc_currentIndexChanged(int index)
@@ -209,7 +229,7 @@ void ClifView::on_tree_itemActivated(QTreeWidgetItem *item, int column)
     root->openDataset();
     ui->menuTools->actions().at(0)->setEnabled(true);
     
-    ui->datasetSlider->setMaximum(root->dataset->imgCount()-1);
+    ui->datasetSlider->setMaximum(root->dataset->Datastore::count()-1);
     ui->datasetSlider->setValue(0);
     
     on_datasetSlider_valueChanged(0);

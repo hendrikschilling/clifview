@@ -95,6 +95,11 @@
               <string>demosaic</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>undistort</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>
